@@ -14,12 +14,14 @@
  */
 import { createHash } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
+import { basename } from 'node:path';
 import { and, desc, eq, ilike } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { imports, items, shopState, shops, stock } from '../db/schema.js';
 import { logger } from '../logger.js';
 import { МАГАЗИНЫ } from './магазины.js';
 import { разобратьПрайс, type Позиция } from './парсер.js';
+import { времяИзИмени } from './свежесть.js';
 import { проверитьПрайс, type ПрошлыйИмпорт } from './валидация.js';
 
 /**
@@ -34,9 +36,25 @@ export type ИтогИмпорта =
   | { исход: 'дубль'; importId: number; статус: string; файл: string }
   | { исход: 'отбит'; importId: number; причина: string };
 
-export async function импортироватьПрайс(путь: string): Promise<ИтогИмпорта> {
+export interface ОпцииИмпорта {
+  /**
+   * Момент выгрузки прайса из Форы. Задаёт забор с FTP (из имени файла или mtime
+   * источника). Если не задан — пробуем достать из имени файла, иначе локальный
+   * mtime. Локальный mtime — худший вариант: для скачанного файла это время
+   * скачивания, а бот показывает эту дату покупателю.
+   */
+  файлОт?: Date;
+  /** Имя для журнала. Для FTP — исходное имя на сервере, а не путь во времянке. */
+  исходноеИмя?: string;
+}
+
+export async function импортироватьПрайс(
+  путь: string,
+  опции: ОпцииИмпорта = {},
+): Promise<ИтогИмпорта> {
   const данные = await readFile(путь);
   const хеш = createHash('sha256').update(данные).digest('hex');
+  const имяДляЖурнала = опции.исходноеИмя ?? путь;
 
   // Дедуп до всякой работы: файл мог приехать с FTP повторно.
   // Сверяем и с отбитыми тоже — иначе автозабор (этап 3) будет перемалывать
@@ -52,7 +70,9 @@ export async function импортироватьПрайс(путь: string): Pr
   }
 
   const разбор = await разобратьПрайс(путь);
-  const файлОт = (await stat(путь)).mtime;
+  // Время выгрузки: явно переданное → из имени файла → локальный mtime (худший).
+  const файлОт =
+    опции.файлОт ?? времяИзИмени(basename(имяДляЖурнала)) ?? (await stat(путь)).mtime;
 
   const [прошлый] = await db
     .select({ id: imports.id, файл: imports.файл, позиций: imports.позиций })
@@ -69,7 +89,7 @@ export async function импортироватьПрайс(путь: string): Pr
     const [запись] = await db
       .insert(imports)
       .values({
-        файл: путь,
+        файл: имяДляЖурнала,
         хеш,
         размерБайт: разбор.размерБайт,
         раскладка: разбор.раскладка.имя,
@@ -87,7 +107,7 @@ export async function импортироватьПрайс(путь: string): Pr
     const [запись] = await тр
       .insert(imports)
       .values({
-        файл: путь,
+        файл: имяДляЖурнала,
         хеш,
         размерБайт: разбор.размерБайт,
         раскладка: разбор.раскладка.имя,
