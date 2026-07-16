@@ -1,6 +1,9 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    # pgvector/pgvector:pg16 — тот же Postgres 16, но с расширением pgvector
+    # (нужно для семантического поиска, этап 5). Data-формат PG16 совместим с
+    # прежним postgres:16-alpine, том pgdata переживает смену образа.
+    image: pgvector/pgvector:pg16
     container_name: telewin-postgres
     restart: unless-stopped
     environment:
@@ -62,6 +65,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      # Эмбеддинги (этап 5) и чат (этап 6) — через OpenRouter, тем же ключом.
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-google/gemini-embedding-001}
+      EMBEDDING_DIM: ${EMBEDDING_DIM:-3072}
       # Windows/macOS не пробрасывают inotify через bind mount, и tsx watch не видит
       # правок в src/. Опрос файлов это чинит. На Linux можно выключить (CHOKIDAR_USEPOLLING=false).
       CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-true}

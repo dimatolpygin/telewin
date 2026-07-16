@@ -1,0 +1,594 @@
+{
+  "id": "eb3f1a3b-24ed-480f-b6e5-0e4bc605fae0",
+  "prevId": "eed26ec7-4953-48c6-af52-e7a222e6df2c",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.app_meta": {
+      "name": "app_meta",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.imports": {
+      "name": "imports",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "файл": {
+          "name": "файл",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "хеш": {
+          "name": "хеш",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "размер_байт": {
+          "name": "размер_байт",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "раскладка": {
+          "name": "раскладка",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "статус": {
+          "name": "статус",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "причина_отказа": {
+          "name": "причина_отказа",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "позиций": {
+          "name": "позиций",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "файл_от": {
+          "name": "файл_от",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "создан": {
+          "name": "создан",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "imports_хеш_uq": {
+          "name": "imports_хеш_uq",
+          "columns": [
+            {
+              "expression": "хеш",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.items": {
+      "name": "items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "import_id": {
+          "name": "import_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "строка": {
+          "name": "строка",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "штрихкод": {
+          "name": "штрихкод",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "артикул": {
+          "name": "артикул",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "наименование": {
+          "name": "наименование",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "наименование_norm": {
+          "name": "наименование_norm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "norm_search(\"наименование\")",
+            "type": "stored"
+          }
+        },
+        "единица": {
+          "name": "единица",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "производитель": {
+          "name": "производитель",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "цена": {
+          "name": "цена",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "остаток_общий": {
+          "name": "остаток_общий",
+          "type": "numeric(14, 3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "категория": {
+          "name": "категория",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "вид_товара": {
+          "name": "вид_товара",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "items_import_id_idx": {
+          "name": "items_import_id_idx",
+          "columns": [
+            {
+              "expression": "import_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "items_артикул_idx": {
+          "name": "items_артикул_idx",
+          "columns": [
+            {
+              "expression": "артикул",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "items_штрихкод_idx": {
+          "name": "items_штрихкод_idx",
+          "columns": [
+            {
+              "expression": "штрихкод",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "items_наим_fts_idx": {
+          "name": "items_наим_fts_idx",
+          "columns": [
+            {
+              "expression": "to_tsvector('russian', \"наименование_norm\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "items_наим_trgm_idx": {
+          "name": "items_наим_trgm_idx",
+          "columns": [
+            {
+              "expression": "\"наименование_norm\" gin_trgm_ops",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "items_import_id_imports_id_fk": {
+          "name": "items_import_id_imports_id_fk",
+          "tableFrom": "items",
+          "tableTo": "imports",
+          "columnsFrom": [
+            "import_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shop_state": {
+      "name": "shop_state",
+      "schema": "",
+      "columns": {
+        "shop_id": {
+          "name": "shop_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "текущий_import_id": {
+          "name": "текущий_import_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "данные_от": {
+          "name": "данные_от",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "обновлён": {
+          "name": "обновлён",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "shop_state_shop_id_shops_id_fk": {
+          "name": "shop_state_shop_id_shops_id_fk",
+          "tableFrom": "shop_state",
+          "tableTo": "shops",
+          "columnsFrom": [
+            "shop_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "shop_state_текущий_import_id_imports_id_fk": {
+          "name": "shop_state_текущий_import_id_imports_id_fk",
+          "tableFrom": "shop_state",
+          "tableTo": "imports",
+          "columnsFrom": [
+            "текущий_import_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shops": {
+      "name": "shops",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "код": {
+          "name": "код",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "название": {
+          "name": "название",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "shops_код_unique": {
+          "name": "shops_код_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "код"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stock": {
+      "name": "stock",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "import_id": {
+          "name": "import_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "shop_id": {
+          "name": "shop_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "остаток": {
+          "name": "остаток",
+          "type": "numeric(14, 3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "stock_item_shop_uq": {
+          "name": "stock_item_shop_uq",
+          "columns": [
+            {
+              "expression": "item_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "shop_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stock_import_shop_idx": {
+          "name": "stock_import_shop_idx",
+          "columns": [
+            {
+              "expression": "import_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "shop_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "stock_import_id_imports_id_fk": {
+          "name": "stock_import_id_imports_id_fk",
+          "tableFrom": "stock",
+          "tableTo": "imports",
+          "columnsFrom": [
+            "import_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "stock_item_id_items_id_fk": {
+          "name": "stock_item_id_items_id_fk",
+          "tableFrom": "stock",
+          "tableTo": "items",
+          "columnsFrom": [
+            "item_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "stock_shop_id_shops_id_fk": {
+          "name": "stock_shop_id_shops_id_fk",
+          "tableFrom": "stock",
+          "tableTo": "shops",
+          "columnsFrom": [
+            "shop_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.эмбеддинги": {
+      "name": "эмбеддинги",
+      "schema": "",
+      "columns": {
+        "наименование": {
+          "name": "наименование",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "модель": {
+          "name": "модель",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "вектор": {
+          "name": "вектор",
+          "type": "vector(2560)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "создан": {
+          "name": "создан",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -17,6 +17,7 @@
     "price:imports": "tsx --env-file-if-exists=.env src/cli/price-imports.ts",
     "price:find": "tsx --env-file-if-exists=.env src/cli/price-find.ts",
     "price:fetch": "tsx --env-file-if-exists=.env src/cli/price-fetch.ts",
+    "price:embed": "tsx --env-file-if-exists=.env src/cli/price-embed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
