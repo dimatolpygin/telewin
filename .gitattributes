@@ -1,0 +1,9 @@
+# Скрипты, которые исполняются внутри Linux-контейнера, обязаны иметь LF.
+# Без этого Windows закоммитит CRLF и sh в контейнере упадёт с «not found».
+*.sh text eol=lf
+docker/entrypoint.sh text eol=lf
+Dockerfile text eol=lf
+
+# Прайсы — бинарники, не трогать переводы строк
+*.xls binary
+*.xlsx binary

@@ -1,0 +1,28 @@
+# Секреты — внутрь образа не попадают ни при каких условиях.
+# Переменные приезжают через окружение (docker-compose / GitHub Secrets).
+.env
+.env.*
+!.env.example
+доступы.txt
+docs/ACCESSES.md
+.secrets/
+*.pem
+*.key
+id_rsa*
+
+# Мусор и тяжёлое
+.git
+.gitignore
+node_modules
+dist
+build
+coverage
+*.log
+logs
+
+# Данные клиента и документация — приложению в образе не нужны
+samples
+assets
+docs
+*.xls
+*.xlsx
