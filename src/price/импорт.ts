@@ -15,7 +15,7 @@
 import { createHash } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
 import { basename } from 'node:path';
-import { and, desc, eq, ilike } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { imports, items, shopState, shops, stock } from '../db/schema.js';
 import { logger } from '../logger.js';
@@ -272,72 +272,5 @@ export async function свежестьМагазинов() {
     .orderBy(shops.id);
 }
 
-export interface НайденнаяПозиция {
-  наименование: string;
-  артикул: string | null;
-  единица: string | null;
-  цена: string;
-  остатокОбщий: string;
-  остаток: string;
-  магазин: string;
-  данныеОт: Date | null;
-  importId: number;
-}
-
-/**
- * Минимальный поиск по текущему снимку — подстрокой, для проверки этапа 2.
- * Настоящий поиск (нормализация запроса, ранжирование) — этап 4.
- *
- * Запрос идёт от `shop_state`, а не от «последнего импорта»: бот обязан видеть
- * ровно то, на что указывает магазин, иначе отбитый импорт мог бы просочиться.
- */
-export async function найтиВТекущем(запрос: string, предел = 20): Promise<НайденнаяПозиция[]> {
-  const итог: НайденнаяПозиция[] = [];
-  const состояния = await свежестьМагазинов();
-
-  for (const состояние of состояния) {
-    if (состояние.importId === null) continue;
-
-    const строки = await db
-      .select({
-        наименование: items.наименование,
-        артикул: items.артикул,
-        единица: items.единица,
-        цена: items.цена,
-        остатокОбщий: items.остатокОбщий,
-        остаток: stock.остаток,
-      })
-      .from(items)
-      .innerJoin(stock, eq(stock.itemId, items.id))
-      .innerJoin(shops, eq(shops.id, stock.shopId))
-      .where(
-        and(
-          eq(items.importId, состояние.importId),
-          eq(shops.код, состояние.код),
-          ilike(items.наименование, `%${экранироватьLike(запрос.trim())}%`),
-        ),
-      )
-      .orderBy(items.строка)
-      .limit(предел);
-
-    for (const строка of строки) {
-      итог.push({
-        ...строка,
-        магазин: состояние.название,
-        данныеОт: состояние.данныеОт,
-        importId: состояние.importId,
-      });
-    }
-  }
-
-  return итог;
-}
-
-/**
- * Экранируем спецсимволы LIKE. Значение уходит параметром, так что инъекции тут
- * нет, но без экранирования «%» в запросе покупателя молча совпал бы со всем
- * подряд, а «_» — с любым символом.
- */
-function экранироватьLike(текст: string): string {
-  return текст.replace(/[\\%_]/g, (символ) => `\\${символ}`);
-}
+// Поиск по текущему снимку переехал в `./поиск.ts` (этап 4): точное совпадение
+// по артикулу/штрихкоду, полнотекст и триграммы вместо прежнего ilike-подстроки.
