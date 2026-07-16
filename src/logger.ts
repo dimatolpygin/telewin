@@ -3,10 +3,12 @@
  * на каждое действие.
  */
 import pino from 'pino';
-import { config } from './config.js';
 
 export const logger = pino({
-  level: config.app.logLevel,
+  // LOG_LEVEL читаем напрямую, а не через config: логгер не должен требовать
+  // пароль от Postgres, чтобы напечатать строку. Иначе CLI (например price:parse)
+  // не запустится без поднятой базы.
+  level: process.env.LOG_LEVEL ?? 'info',
   transport: {
     target: 'pino-pretty',
     options: {
