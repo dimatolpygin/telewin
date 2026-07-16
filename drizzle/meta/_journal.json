@@ -8,6 +8,13 @@
       "when": 1784180769193,
       "tag": "0000_short_mister_fear",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784186831367,
+      "tag": "0001_condemned_chimera",
+      "breakpoints": true
     }
   ]
 }

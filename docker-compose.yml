@@ -9,6 +9,16 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      # Порт нужен инструментам с хоста (drizzle-kit, CLI price:*). Внутри compose
+      # приложение ходит на postgres:5432 и этот проброс не использует.
+      #
+      # Наружу отдаём 5433, а не 5432, и только на 127.0.0.1. Причины:
+      # 1) 5432 на машине разработчика почти наверняка занят другим постгресом
+      #    (у нас так и было — localhost:5432 оказался чужой базой, и db:migrate
+      #    с хоста поехал бы создавать таблицы telewin в ней);
+      # 2) база не должна быть видна из локальной сети.
+      - '127.0.0.1:${POSTGRES_PORT_HOST:-5433}:5432'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 5s
@@ -22,6 +32,10 @@ services:
     restart: unless-stopped
     volumes:
       - redisdata:/data
+    ports:
+      # 6380, а не 6379: штатный порт на машине разработчика тоже бывает занят.
+      # Только на 127.0.0.1 — наружу Redis отдавать нельзя.
+      - '127.0.0.1:${REDIS_PORT_HOST:-6380}:6379'
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 5s

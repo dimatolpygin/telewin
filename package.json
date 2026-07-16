@@ -13,6 +13,9 @@
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "price:parse": "tsx src/cli/price-parse.ts",
+    "price:import": "tsx --env-file-if-exists=.env src/cli/price-import.ts",
+    "price:imports": "tsx --env-file-if-exists=.env src/cli/price-imports.ts",
+    "price:find": "tsx --env-file-if-exists=.env src/cli/price-find.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
