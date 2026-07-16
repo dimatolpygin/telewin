@@ -20,6 +20,7 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "basic-ftp": "^5.3.1",
     "drizzle-orm": "^0.45.2",
     "fastify": "^5.2.1",
     "ioredis": "^5.4.2",
